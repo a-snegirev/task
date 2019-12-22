@@ -1,0 +1,70 @@
+import pygame, math
+size = 440
+
+pygame.init()
+screen = pygame.display.set_mode([size,size])
+screen.fill((255,255,255))
+for i in range(0, size, 11):
+    pygame.draw.line(screen, (0,0,0), [0 , i], [size, i],1)
+    pygame.draw.line(screen, (0,0,0), [i, 0], [i, size],1)
+pygame.display.update()
+
+m0 = []
+m = []
+for i in range(0,int(size/11 +2)):
+    m0.append([0]*int(size/11 +2))
+    m.append([0]*int(size/11 +2))
+
+def neighbour(i,j):
+    count = 0
+    for k in range(3):
+        if m[i-1][j -1+k] == 1:
+            count += 1
+        if m[i + 1 ][j - 1+k] == 1:
+            count += 1
+    for k in range(2):
+        if m[i][j-1 +2*k] == 1:
+            count += 1
+    return count
+
+flag = 1
+while flag == 1:
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                x1, y1 = event.pos
+                x = math.floor(x1/11)*11
+                y = math.floor(y1/11)*11
+                pygame.draw.circle(screen, (0, 0, 0), (x+6, y+6), 5)
+                pygame.display.update()
+                m[int(y/11)+1][int(x/11)+1] = 1
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_0:
+                flag = 0
+
+while 1:
+    for i in range(1,int(size/11)+1):
+        for j in range(1,int(size/11)+1):
+            if m[i][j] == 1:
+                if neighbour(i,j) == 2 or neighbour(i,j) == 3:
+                    m0[i][j] = 1
+                else:
+                    m0[i][j] = 0
+            elif m[i][j] == 0:
+                if neighbour(i,j) == 3:
+                    m0[i][j] = 1
+                else:
+                    m0[i][j] = 0
+
+    for i in range(1,int(size/11)+1):
+        for j in range(1,int(size/11)+1):
+            m[i][j] = m0[i][j]
+
+    for i in range(1,int(size/11)+1):
+        for j in range(1,int(size/11)+1):
+            if m[i][j] == 1:
+                pygame.draw.circle(screen, (0, 0, 0), ((j-1)*11 + 6, (i-1)*11 + 6), 5)
+            elif m[i][j] == 0:
+                pygame.draw.circle(screen, (255, 255, 255), ((j-1) * 11 + 6, (i-1) * 11 + 6), 5)
+    pygame.display.update()
+    pygame.time.delay(50)
